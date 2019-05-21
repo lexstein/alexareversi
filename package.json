@@ -1,0 +1,26 @@
+{
+  "name": "alexareversi",
+  "version": "1.0.0",
+  "description": "This is the game of reversi",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lexstein/alexareversi.git"
+  },
+  "keywords": [
+    "reversi"
+  ],
+  "author": "Alexa Steinhauser",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/lexstein/alexareversi/issues"
+  },
+  "homepage": "https://github.com/lexstein/alexareversi#readme",
+  "dependencies": {
+    "node-static": "^0.7.11",
+    "socket.io": "^2.2.0"
+  }
+}
