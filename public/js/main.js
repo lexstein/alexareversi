@@ -102,9 +102,9 @@ socket.on('player_disconnected',function(payload){
 var dom_elements = $('.socket_'+payload.socket_id);
 
 /* If something exists */
-if(dom_elements.length == 0){
+if(dom_elements.length != 0){
   dom_elements.slideUp(1000);
-
+}
 /* Manage the message that a player has left */
   var newHTML = '<p>'+payload.username+' has left the lobby</p>';
   var newNode = $(newHTML);
