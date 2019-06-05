@@ -84,7 +84,7 @@ else{
   var newHTML = '<p>'+payload.username+' just entered the lobby</p>';
   var newNode = $(newHTML);
   newNode.hide();
-  $('#messages').append(newNode);
+  $('#messages').prepend(newNode);
   newNode.slideDown(1000);
 });
 
@@ -112,7 +112,7 @@ if(dom_elements.length != 0){
   var newHTML = '<p>'+payload.username+' has left the lobby</p>';
   var newNode = $(newHTML);
   newNode.hide();
-  $('#messages').append(newNode);
+  $('#messages').prepend(newNode);
   newNode.slideDown(1000);
 });
 
@@ -213,7 +213,7 @@ socket.on('send_message_response',function(payload){
   var newHTML = '<p><b>'+payload.username+' says:</b> '+payload.message+'</p>';
   var newNode = $(newHTML);
   newNode.hide();
-  $('#messages').append(newNode);
+  $('#messages').prepend(newNode);
   newNode.slideDown(1000);
 });
 
@@ -259,4 +259,161 @@ $(function(){
 
   console.log('*** Client Log Message: \' join_room\' payload: '+JSON.stringify(payload));
   socket.emit('join_room',payload);
+
+  $('#quit').append('<a href="lobby.html?username='+username+'" class="btn btn-danger btn-default active" role="button" aria-pressed="true">Quit</a>');
+
+});
+
+/* Code for the board specifically */
+
+var old_board = [
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?'],
+                  ['?', '?', '?', '?', '?', '?', '?', '?']
+                ];
+
+var my_color = ' ';
+
+socket.on('game_update', function(payload){
+  console.log('*** Client Log Message: \'game_update\'\n\tpayload: '+JSON.stringify(payload));
+
+/* Check for a good board update */
+  if(payload.result == 'fail'){
+    console.log(payload.message);
+    window.location.href = 'lobby.html?username='+username;
+    return;
+  }
+
+/* Check for a good board in the payload */
+  var board = payload.game.board;
+  if('undefined' == typeof board || !board){
+    console.log('Internal error: received a malformed board update from the server');
+    return;
+  }
+
+/* Update my color */
+
+if(socket.id == payload.game.player_Peace.socket){
+  my_color = 'Peace';
+}
+else if(socket.id == payload.game.player_Smiley.socket){
+  my_color = 'Smiley';
+}
+else{
+
+/* Something weird is going on, like three people playing at once
+/* Send client back to the lobby*/
+  window.location.href = 'lobby.html?username='+username;
+  return;
+}
+
+$('#my_color').html('<h3 id="my_color">I am '+my_color+'</h3>');
+$('#my_color').append('<h4>It is '+payload.game.whose_turn+'\'s turn</h4>');
+
+/* Animate changes to the board */
+
+  var Smileysum = 0;
+  var Peacesum = 0;
+
+  var row,column;
+  for (row = 0; row < 8; row++){
+    for(column = 0; column < 8; column++){
+      if(board[row][column] == 'S'){
+        Smileysum++;
+      }
+      if(board[row][column] == 'P'){
+        Peacesum++;
+      }
+
+/* If a board space has changed */
+      if(old_board[row][column] != board[row][column]){
+        if(old_board[row][column] == '?' && board[row][column] == ' '){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty.gif" alt="empty square"/>');
+        }
+        else if(old_board[row][column]== '?' && board[row][column] == 'P'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
+        }
+        else if(old_board[row][column]== '?' && board[row][column] == 'S'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Smiley.gif" alt="Smiley square"/>');
+        }
+        else if(old_board[row][column]== ' ' && board[row][column] == 'P'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
+        }
+        else if(old_board[row][column]== ' ' && board[row][column] == 'S'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Smiley.gif" alt="Smiley square"/>');
+        }
+        else if(old_board[row][column]== 'L' && board[row][column] == ' '){
+          $('#'+row+'_'+column).html('<img src="assets/images/Peace-to-Empty.gif" alt="Empty square"/>');
+        }
+        else if(old_board[row][column]== 'T' && board[row][column] == ' '){
+          $('#'+row+'_'+column).html('<img src="assets/images/Smiley-to-Empty.gif" alt="Empty square"/>');
+        }
+        else if(old_board[row][column]== 'L' && board[row][column] == 'S'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Peace-to-Smiley.gif" alt="Peace square"/>');
+        }
+        else if(old_board[row][column]== 'T' && board[row][column] == 'P'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Smiley-to-Peace.gif" alt="Smiley square"/>');
+        }
+        else{
+          $('#'+row+'_'+column).html('<img src="assets/images/error.gif" alt="error"/>');
+        }
+      }
+
+/* Set up interactivity */
+      $('#'+row+'_'+column).off('click');
+      $('#'+row+'_'+column).removeClass('hovered_over');
+
+      if(payload.game.whose_turn === my_color){
+        if(payload.game.legal_moves[row][column] === my_color.substr(0,1)){
+          $('#'+row+'_'+column).addClass('hovered_over');
+          $('#'+row+'_'+column).click(function(r,c){
+            return function(){
+              var payload = {};
+              payload.row = r;
+              payload.column = c;
+              payload.color = my_color;
+              console.log('*** Client Log Message: \'play_token\' payload: '+JSON.stringify(payload));
+              socket.emit('play_token', payload);
+            };
+          }(row, column));
+        }
+      }
+    }
+  }
+  $('#Smileysum').html(Smileysum);
+  $('#Peacesum').html(Peacesum);
+
+  old_board = board;
+});
+
+socket.on('play_token_response', function(payload){
+  console.log('*** Client Log Message: \'play_token_response\'\n\tpayload: '+JSON.stringify(payload));
+
+/* Check for a play_token_response */
+  if(payload.result == 'fail'){
+    console.log(payload.message);
+    alert(payload.message);
+    return;
+  }
+});
+
+socket.on('game_over', function(payload){
+  console.log('*** Client Log Message: \'game_over\'\n\tpayload: '+JSON.stringify(payload));
+
+/* Check for a play_token_response */
+  if(payload.result == 'fail'){
+    console.log(payload.message);
+    return;
+  }
+
+  /* Jump to a new page */
+
+  $('#game_over').html('<h1>Game Over</h1><h2>'+payload.who_won+' won!</h2>');
+  $('#game_over').append('<a href="lobby.html?username='+username+'" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Return to the lobby</a>');
+
 });
