@@ -62,7 +62,7 @@ if(dom_elements.length == 0){
 
   nodeC.addClass('col-3 text-left');
   var buttonC = makeInviteButton(payload.socket_id);
-  nodeC.append(buttonC)
+  nodeC.append(buttonC);
 
   nodeA.hide();
   nodeB.hide();

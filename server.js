@@ -157,7 +157,7 @@ socket.on('disconnect',function(){
 			if('undefined' !== typeof players[socket.id] && players[socket.id]){
 			var username = players[socket.id].username;
 			var room = players[socket.id].room;
-			var payload = {
+			payload = {
 											username: username,
 											socket_id: socket.id
 										};
@@ -234,7 +234,7 @@ socket.on('disconnect',function(){
 											};
 
 		io.in(room).emit('send_message_response',success_data);
-		log('Message sent to room ' + room + ' by ' + username + 'success_data:'+JSON.stringify(success_data));
+		log('Message sent to room ' + room + ' by ' + username);
 	});
 
 	/* invite command */
@@ -725,7 +725,7 @@ function create_new_game(){
 											[' ',' ',' ',' ',' ',' ',' ',' '],
 											[' ',' ',' ',' ',' ',' ',' ',' ']
 										];
-	new_game.legal_moves = calculate_valid_moves('s', new_game.board);
+	new_game.legal_moves = calculate_valid_moves('S', new_game.board);
 	return new_game;
 }
 
