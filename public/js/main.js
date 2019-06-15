@@ -367,10 +367,10 @@ interval_timer = setInterval(function(last_time){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
         }
         else if(old_board[row][column]== 'S' && board[row][column] == ' '){
-          $('#'+row+'_'+column).html('<img src="assets/images/hover.gif" alt="Empty square"/>');
+          $('#'+row+'_'+column).html('<img src="assets/images/empty.gif" alt="Empty square"/>');
         }
         else if(old_board[row][column]== 'P' && board[row][column] == ' '){
-          $('#'+row+'_'+column).html('<img src="assets/images/hover.gif" alt="Empty square"/>');
+          $('#'+row+'_'+column).html('<img src="assets/images/empty.gif" alt="Empty square"/>');
         }
         else if(old_board[row][column]== 'S' && board[row][column] == 'P'){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
