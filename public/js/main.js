@@ -15,7 +15,7 @@ function getURLParameters(whichParam)
 
 var username = getURLParameters('username');
 if('undefined' == typeof username || !username){
-  username = 'Anonymous_'+Math.random();
+  username = 'Anonymous_'+Math.floor(Math.random()*100);
 }
 var chat_room = getURLParameters('game_id');
 if('undefined' == typeof chat_room || !chat_room){
@@ -44,6 +44,7 @@ socket.on('join_room_response',function(payload){
 
 /* If someone joined then add a new row to lobby table */
 var dom_elements = $('.socket_'+payload.socket_id);
+
 /* If we don't already have an entry for this person */
 if(dom_elements.length == 0){
   var nodeA = $('<div></div>');
@@ -57,10 +58,10 @@ if(dom_elements.length == 0){
 
   nodeA.addClass('w-100');
 
-  nodeB.addClass('col-9 text-right');
-  nodeB.append('<h4>'+payload.username+'</h4>');
+  nodeB.addClass('col-6 text-right');
+  nodeB.append('<h4><font color = "navy">'+payload.username+'</font></h4>');
 
-  nodeC.addClass('col-3 text-left');
+  nodeC.addClass('col-6 text-left');
   var buttonC = makeInviteButton(payload.socket_id);
   nodeC.append(buttonC);
 
@@ -299,11 +300,11 @@ socket.on('game_update', function(payload){
 
 /* Update my color */
 
-if(socket.id == payload.game.player_Peace.socket){
-  my_color = 'Peace';
-}
-else if(socket.id == payload.game.player_Smiley.socket){
+if(socket.id == payload.game.player_Smiley.socket){
   my_color = 'Smiley';
+}
+else if(socket.id == payload.game.player_Peace.socket){
+  my_color = 'Peace';
 }
 else{
 
@@ -335,17 +336,17 @@ interval_timer = setInterval(function(last_time){
       , 1000);
 /* Animate changes to the board */
 
-  var Smileysum = 0;
   var Peacesum = 0;
+  var Smileysum = 0;
 
   var row,column;
   for (row = 0; row < 8; row++){
     for(column = 0; column < 8; column++){
-      if(board[row][column] == 'S'){
-        Smileysum++;
-      }
       if(board[row][column] == 'P'){
         Peacesum++;
+      }
+      if(board[row][column] == 'S'){
+        Smileysum++;
       }
 
 /* If a board space has changed */
@@ -353,29 +354,29 @@ interval_timer = setInterval(function(last_time){
         if(old_board[row][column] == '?' && board[row][column] == ' '){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty.gif" alt="empty square"/>');
         }
-        else if(old_board[row][column]== '?' && board[row][column] == 'P'){
-          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
-        }
         else if(old_board[row][column]== '?' && board[row][column] == 'S'){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Smiley.gif" alt="Smiley square"/>');
         }
-        else if(old_board[row][column]== ' ' && board[row][column] == 'P'){
+        else if(old_board[row][column]== '?' && board[row][column] == 'P'){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
         }
         else if(old_board[row][column]== ' ' && board[row][column] == 'S'){
           $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Smiley.gif" alt="Smiley square"/>');
         }
-        else if(old_board[row][column]== 'L' && board[row][column] == ' '){
-          $('#'+row+'_'+column).html('<img src="assets/images/Peace-to-Empty.gif" alt="Empty square"/>');
+        else if(old_board[row][column]== ' ' && board[row][column] == 'P'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
         }
-        else if(old_board[row][column]== 'T' && board[row][column] == ' '){
-          $('#'+row+'_'+column).html('<img src="assets/images/Smiley-to-Empty.gif" alt="Empty square"/>');
+        else if(old_board[row][column]== 'S' && board[row][column] == ' '){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty.gif" alt="Empty square"/>');
         }
-        else if(old_board[row][column]== 'L' && board[row][column] == 'S'){
-          $('#'+row+'_'+column).html('<img src="assets/images/Peace-to-Smiley.gif" alt="Peace square"/>');
+        else if(old_board[row][column]== 'P' && board[row][column] == ' '){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty.gif" alt="Empty square"/>');
         }
-        else if(old_board[row][column]== 'T' && board[row][column] == 'P'){
-          $('#'+row+'_'+column).html('<img src="assets/images/Smiley-to-Peace.gif" alt="Smiley square"/>');
+        else if(old_board[row][column]== 'S' && board[row][column] == 'P'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Peace.gif" alt="Peace square"/>');
+        }
+        else if(old_board[row][column]== 'P' && board[row][column] == 'S'){
+          $('#'+row+'_'+column).html('<img src="assets/images/Empty-to-Smiley.gif" alt="Smiley square"/>');
         }
         else{
           $('#'+row+'_'+column).html('<img src="assets/images/error.gif" alt="error"/>');
@@ -403,8 +404,8 @@ interval_timer = setInterval(function(last_time){
       }
     }
   }
-  $('#Smileysum').html(Smileysum);
   $('#Peacesum').html(Peacesum);
+  $('#Smileysum').html(Smileysum);
 
   old_board = board;
 });
